@@ -3,12 +3,19 @@
 #include "imgui/imgui_impl_dx11.h"
 #include <d3d11.h>
 #include <tchar.h>
+#include "Renderer.h"
+#include "DrawScene.hpp"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "imgui/stb_image.h"
 
 // Data
-static ID3D11Device*            g_pd3dDevice = NULL;
-static ID3D11DeviceContext*     g_pd3dDeviceContext = NULL;
-static IDXGISwapChain*          g_pSwapChain = NULL;
-static ID3D11RenderTargetView*  g_mainRenderTargetView = NULL;
+static ID3D11Device*             g_pd3dDevice = NULL;
+static ID3D11DeviceContext*      g_pd3dDeviceContext = NULL;
+static IDXGISwapChain*           g_pSwapChain = NULL;
+static ID3D11RenderTargetView*   g_mainRenderTargetView = NULL;
+static ID3D11ShaderResourceView* gallow = NULL;
+static ID3D11ShaderResourceView* grass = NULL;
 
 // Forward declarations of helper functions
 bool CreateDeviceD3D(HWND hWnd);
@@ -20,12 +27,58 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 // Added to provent command window from poping up in background.
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
+bool LoadTextureFromFile(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height)
+{
+    // Load from disk into a raw RGBA buffer
+    int image_width = 0;
+    int image_height = 0;
+    unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
+    if (image_data == NULL)
+        return false;
+
+    // Create texture
+    D3D11_TEXTURE2D_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.Width = image_width;
+    desc.Height = image_height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = 0;
+
+    ID3D11Texture2D* pTexture = NULL;
+    D3D11_SUBRESOURCE_DATA subResource;
+    subResource.pSysMem = image_data;
+    subResource.SysMemPitch = desc.Width * 4;
+    subResource.SysMemSlicePitch = 0;
+    g_pd3dDevice->CreateTexture2D(&desc, &subResource, &pTexture);
+
+    // Create texture view
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    ZeroMemory(&srvDesc, sizeof(srvDesc));
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    g_pd3dDevice->CreateShaderResourceView(pTexture, &srvDesc, out_srv);
+    pTexture->Release();
+
+    *out_width = image_width;
+    *out_height = image_height;
+    stbi_image_free(image_data);
+
+    return true;
+}
+
 // Main code
 int main(int, char**)
 {
     // Create application window
     ImGui_ImplWin32_EnableDpiAwareness();
-    WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("ImGui Example"), NULL };
+    WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("Hangman"), NULL };
     ::RegisterClassEx(&wc);
     HWND hwnd = ::CreateWindow(wc.lpszClassName, _T("Hangman"), WS_OVERLAPPEDWINDOW, 100, 100, 1038, 625, NULL, NULL, wc.hInstance, NULL);
 
@@ -52,6 +105,17 @@ int main(int, char**)
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
+
+    // Load Images
+    int GallowWidth = 1000;
+    int GallowHeight = 1100;
+    bool GallowLoaded = LoadTextureFromFile("gallow.png", &gallow, &GallowWidth, &GallowHeight);
+    IM_ASSERT(GallowLoaded);
+
+    int GrassWidth = 2000;
+    int GrassHeight = 250;
+    bool GrassLoaded = LoadTextureFromFile("grass.png", &grass, &GrassWidth, &GrassHeight);
+    IM_ASSERT(GrassLoaded);
 
     // Setup Fonts
     ImFont* ArialFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
@@ -82,9 +146,17 @@ int main(int, char**)
 
         // Main ImGui Drawing goes here!
         {
-            bool menu_show = true;
-            ImGui::Begin("Hangman", &menu_show, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar);
+            bool show = true;
+
+            ImGui::Begin("Hangman", &show, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar);
             ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
+            
+            // Draw Dynamic Scene
+            DrawScene();
+
+            // Draw Scene Images
+            ImGui::Image((void*)gallow, ImVec2(310, 400));
+            ImGui::Image((void*)grass, ImVec2(1000, 142));
             ImGui::End();
         }
 

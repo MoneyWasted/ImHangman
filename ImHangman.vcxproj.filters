@@ -23,6 +23,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
@@ -52,6 +53,11 @@
       <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="DrawScene.hpp" />
+    <ClInclude Include="imgui\stb_image.h">
       <Filter>imgui</Filter>
     </ClInclude>
   </ItemGroup>
