@@ -6,7 +6,8 @@ bool Renderer::OnScreen(ImVec2 coords)
     {
         return false;
     }
-    else {
+    else 
+    {
         return true;
     }
 }
