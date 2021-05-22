@@ -60,5 +60,7 @@
     <ClInclude Include="imgui\stb_image.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="Style.h" />
+    <ClInclude Include="WordManager.hpp" />
   </ItemGroup>
 </Project>

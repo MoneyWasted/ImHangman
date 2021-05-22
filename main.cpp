@@ -8,14 +8,15 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "imgui/stb_image.h"
+#include "Style.h"
+#include "WordManager.hpp"
 
 // Data
 static ID3D11Device*             g_pd3dDevice = NULL;
 static ID3D11DeviceContext*      g_pd3dDeviceContext = NULL;
 static IDXGISwapChain*           g_pSwapChain = NULL;
 static ID3D11RenderTargetView*   g_mainRenderTargetView = NULL;
-static ID3D11ShaderResourceView* gallow = NULL;
-static ID3D11ShaderResourceView* grass = NULL;
+static ID3D11ShaderResourceView* scene = NULL;
 
 // Forward declarations of helper functions
 bool CreateDeviceD3D(HWND hWnd);
@@ -107,15 +108,10 @@ int main(int, char**)
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 
     // Load Images
-    int GallowWidth = 1000;
-    int GallowHeight = 1100;
-    bool GallowLoaded = LoadTextureFromFile("gallow.png", &gallow, &GallowWidth, &GallowHeight);
-    IM_ASSERT(GallowLoaded);
-
-    int GrassWidth = 2000;
-    int GrassHeight = 250;
-    bool GrassLoaded = LoadTextureFromFile("grass.png", &grass, &GrassWidth, &GrassHeight);
-    IM_ASSERT(GrassLoaded);
+    int SceneWidth = 1038;
+    int SceneHeight = 625;
+    bool SceneLoaded = LoadTextureFromFile("scene.png", &scene, &SceneWidth, &SceneHeight);
+    IM_ASSERT(SceneLoaded);
 
     // Setup Fonts
     ImFont* ArialFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
@@ -141,6 +137,7 @@ int main(int, char**)
         ImGui::NewFrame();
 
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
+        SetupStyle();
         ImGui::SetNextWindowPos(viewport->WorkPos);
         ImGui::SetNextWindowSize(viewport->WorkSize);
 
@@ -149,14 +146,12 @@ int main(int, char**)
             bool show = true;
 
             ImGui::Begin("Hangman", &show, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollbar);
-            ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
             
             // Draw Dynamic Scene
             DrawScene();
 
-            // Draw Scene Images
-            ImGui::Image((void*)gallow, ImVec2(310, 400));
-            ImGui::Image((void*)grass, ImVec2(1000, 142));
+            // Draw Scene Image
+            ImGui::Image((void*)scene, ImVec2(1020, 576));
             ImGui::End();
         }
 
