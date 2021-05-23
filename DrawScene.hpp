@@ -4,15 +4,16 @@
 #include <atomic>
 #include <optional>
 
-Renderer* RENDERER = new Renderer;
+#define MAX_TRIES 5
 #define WHITE ImColor(255, 255, 255, 255)
 
 bool debug = true;
+Renderer* RENDERER = new Renderer;
 std::optional<string> RandWord = RandomWord();
 
 void DrawScene()
 {	
-	auto word = RandWord;
+	auto word = RandWord.value().c_str();
 
     // Handle Float to Char and Display FPS
     char buffer[64];
@@ -41,5 +42,5 @@ void DrawScene()
 	RENDERER->DrawLine(ImVec2(305, 200), ImVec2(355, 250), WHITE, 10); // Left Arm
 
     // Draw Word
-    RENDERER->DrawTextW(ImVec2(500, 200), WHITE, word.value().c_str());
+    RENDERER->DrawTextW(ImVec2(500, 200), WHITE, word);
 }
