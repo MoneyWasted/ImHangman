@@ -1,15 +1,19 @@
 #include "imgui/imgui.h"
 #include "Renderer.h"
 #include "WordManager.hpp"
+#include <atomic>
+#include <optional>
 
 Renderer* RENDERER = new Renderer;
 #define WHITE ImColor(255, 255, 255, 255)
 
-const char* word = "temp";
 bool debug = true;
+std::optional<string> RandWord = RandomWord();
 
 void DrawScene()
 {	
+	auto word = RandWord;
+
     // Handle Float to Char and Display FPS
     char buffer[64];
     int ret = snprintf(buffer, sizeof buffer, "%.f FPS", ImGui::GetIO().Framerate);
@@ -18,11 +22,7 @@ void DrawScene()
 	// DEBUG: Get a new word when button is pressed.
 	if (debug) {
 		ImGui::Begin("Debug", &debug);
-		if (ImGui::Button("Word", ImVec2(50, 25)))
-		{
-			string wrd = RandomWord();
-			word = wrd.c_str();
-		}
+		ImGui::Text("Current Word: %s", word);
 		ImGui::End();
 	}
 
@@ -41,5 +41,5 @@ void DrawScene()
 	RENDERER->DrawLine(ImVec2(305, 200), ImVec2(355, 250), WHITE, 10); // Left Arm
 
     // Draw Word
-    RENDERER->DrawTextW(ImVec2(500, 200), WHITE, word);
+    RENDERER->DrawTextW(ImVec2(500, 200), WHITE, word.value().c_str());
 }
