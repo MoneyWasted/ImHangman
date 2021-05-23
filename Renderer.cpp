@@ -12,14 +12,6 @@ bool Renderer::OnScreen(ImVec2 coords)
     }
 }
 
-void Renderer::DrawButton(ImVec2 pos)
-{
-    if (this->OnScreen(pos))
-    {
-        this->GetDrawList()->AddDrawCmd();
-    }
-}
-
 void Renderer::DrawBox(ImVec2 pos, ImVec2 dim, ImColor color, int thickness)
 {
     if (this->OnScreen(pos))

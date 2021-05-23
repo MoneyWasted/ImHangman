@@ -15,7 +15,6 @@ public:
     void DrawHealthBar(ImVec2 pos, ImVec2 dim, ImColor col);
     void DrawFilledCircle(ImVec2 pos, float radius, float segments, ImColor col);
     bool IsFullscreen(HWND windowHandle);
-    void DrawButton(ImVec2 pos);
     ImDrawList* GetDrawList();
     ImVec2 GetWindowSize();
     ImVec2 GetWindowMiddle();

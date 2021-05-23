@@ -8,4 +8,6 @@ void SetupStyle()
 	ImGuiIO& io = ImGui::GetIO();
 
 	style.WindowPadding = ImVec2(0, 0);
+	style.WindowBorderSize = 0.f;
+	style.PopupBorderSize = 0.f;
 }

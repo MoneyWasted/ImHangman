@@ -81,7 +81,7 @@ int main(int, char**)
     ImGui_ImplWin32_EnableDpiAwareness();
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("Hangman"), NULL };
     ::RegisterClassEx(&wc);
-    HWND hwnd = ::CreateWindow(wc.lpszClassName, _T("Hangman"), WS_OVERLAPPEDWINDOW, 100, 100, 1038, 625, NULL, NULL, wc.hInstance, NULL);
+    HWND hwnd = ::CreateWindow(wc.lpszClassName, _T("Hangman"), WS_OVERLAPPEDWINDOW, 100, 100, 1038, 723, NULL, NULL, wc.hInstance, NULL);
 
     // Initialize Direct3D
     if (!CreateDeviceD3D(hwnd))
@@ -117,7 +117,7 @@ int main(int, char**)
     ImFont* ArialFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
     IM_ASSERT(ArialFont != NULL);
 
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.176470588f, 0.658823529f, 0.898039216f, 1.00f);
 
     // Main loop
     MSG msg;

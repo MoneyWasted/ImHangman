@@ -33,23 +33,3 @@ string RandomWord()
     // Fetch the line where line index (starting from 0) matches with the random number
     return lines[random_number];
 }
-
-int HandleGuess(char guess, string secretword, string& guessword)
-{
-    int i;
-    int matches = 0;
-    int len = secretword.length();
-    for (i = 0; i < len; i++)
-    {
-        // Did we already match this letter in a previous guess?
-        if (guess == guessword[i]) return 0;
-
-        // Is the guess in the word?
-        if (guess == secretword[i])
-        {
-            guessword[i] = guess;
-            matches++;
-        }
-    }
-    return matches;
-}
