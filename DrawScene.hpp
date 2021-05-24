@@ -67,19 +67,17 @@ void DrawScene()
 		// If a key 'A' through 'Z' is pressed.
 		if (ImGui::IsKeyPressed(letter))
 		{
-			// Get the current word length
-			for (int i = 0; i < word.length(); ++i) {
-				// If the guess is correct, fill secret word with the letter.
-				if (word[i] == letter)
+			// iterate over the characters in word and guess
+			for (size_t i = 0; i < sizeof(word.c_str()); i++)
+			{
+				if (word.c_str()[i] == tolower(letter))
 				{
-					
-					HiddenWord[i] = letter;
+					HiddenWord[i] = word[i];  // if the characters match at position i, update the underscore.
 					message = "You found a letter! Isn't that exciting!";
+					break;
 				}
-				// Otherwise increment the number of wrong guesses.
 				else
 				{
-					NumWrongGuesses = NumWrongGuesses + 1;
 					message = "Whoops! That letter isn't in there!";
 				}
 			}
