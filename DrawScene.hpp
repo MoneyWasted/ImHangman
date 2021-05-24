@@ -17,7 +17,8 @@ std::optional<string> RandWord = RandomWord();
 const char* message = "";
 char letter;
 
-vector<char> used;
+// Initialize the secret word with the * character.
+string HiddenWord(RandWord.value().length(), '*');
 
 void DrawScene()
 {
@@ -58,9 +59,6 @@ void DrawScene()
 	// Draw Arms
 	RENDERER->DrawLine(ImVec2(305, 200), ImVec2(255, 250), WHITE, 10); // Right Arm
 	RENDERER->DrawLine(ImVec2(305, 200), ImVec2(355, 250), WHITE, 10); // Left Arm
-
-	// Initialize the secret word with the * character.
-	string HiddenWord(word.length(), '*');
 
 	// Key Press Loop
 	for (letter = 'A'; letter <= 'Z'; letter++) {
