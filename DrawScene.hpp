@@ -4,10 +4,12 @@
 #include <atomic>
 #include <optional>
 #include <iostream>
+#include <algorithm>
 
 #define MAX_TRIES 5
 #define WHITE ImColor(255, 255, 255, 255)
 #define RED ImColor(255, 0, 0, 255)
+#define GREEN ImColor(0, 255, 0, 255)
 
 bool debug = true;
 bool game = true;
@@ -22,6 +24,19 @@ int NumWrongGuesses = 0;
 
 // Initialize the secret word with the * character.
 string HiddenWord(RandWord.value().length(), '*');
+
+vector<int> FindLocation(string sample, char findIt)
+{
+	vector<int> characterLocations;
+	for (int i = 0; i < sample.size(); i++)
+	{
+		if (sample[i] == findIt)
+		{
+			characterLocations.push_back(sample[i]);
+		}
+	}
+	return characterLocations;
+}
 
 void DrawScene()
 {
@@ -54,25 +69,23 @@ void DrawScene()
 		// If a key 'A' through 'Z' is pressed.
 		if (ImGui::IsKeyPressed(letter))
 		{
-			found = HiddenWord.find(letter, 0);
-			if (found != std::string::npos)
+			// Iterate over the characters in word and guess
+			for (size_t i = 0; i < sizeof(word.c_str()); i++)
 			{
-				continue;
+				if (word.c_str()[i] == tolower(letter))
+				{ 
+					std::string s(1, letter);
+					HiddenWord.replace(i, 1, s);
+					message = "You found a letter! Isn't that exciting!";
+					wrong = false;
+					break;
+				}
+				else
+				{
+					wrong = true;
+					message = "Whoops! That letter isn't in there!";
+				}
 			}
-			found = word.find(letter, 0);
-			if (found == std::string::npos)
-			{
-				wrong = true;
-				message = "Whoops! That letter isn't in there!";
-			}
-			while (found != std::string::npos)
-			{
-				guessWord[found] = answer;
-				found = secretWord.find(answer, found + 1);
-			}
-
-			message = "You found a letter! Isn't that exciting!";
-			message = "Whoops! That letter isn't in there!";
 		}
 	}
 
@@ -82,7 +95,14 @@ void DrawScene()
 
 	if (HiddenWord == word.c_str())
 	{
+		NumWrongGuesses = 0;
 		message = "You Won!";
+		RENDERER->DrawFilledCircle(ImVec2(305, 125), 50, 50.f, GREEN); // Head
+		RENDERER->DrawLine(ImVec2(305, 125), ImVec2(305, 300), GREEN, 10); // Body
+		RENDERER->DrawLine(ImVec2(305, 300), ImVec2(255, 350), GREEN, 10); // Right Leg
+		RENDERER->DrawLine(ImVec2(305, 300), ImVec2(355, 350), GREEN, 10); // Left Leg
+		RENDERER->DrawLine(ImVec2(305, 200), ImVec2(255, 250), GREEN, 10); // Right Arm
+		RENDERER->DrawLine(ImVec2(305, 200), ImVec2(355, 250), GREEN, 10); // Left Arm
 	}
 
 	switch (NumWrongGuesses)
