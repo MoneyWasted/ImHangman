@@ -11,6 +11,8 @@
 #include "Style.h"
 #include "WordManager.hpp"
 
+#include "SceneData.h"
+
 // Data
 static ID3D11Device*             g_pd3dDevice = NULL;
 static ID3D11DeviceContext*      g_pd3dDeviceContext = NULL;
@@ -28,12 +30,13 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 // Added to provent command window from poping up in background.
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
-bool LoadTextureFromFile(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height)
+bool LoadTextureFromMemory(unsigned char* ptr, int size, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height)
 {
     // Load from disk into a raw RGBA buffer
     int image_width = 0;
     int image_height = 0;
-    unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
+
+    unsigned char* image_data = stbi_load_from_memory(ptr, size, &image_width, &image_height, NULL, 4);
     if (image_data == NULL)
         return false;
 
@@ -110,7 +113,7 @@ int main(int, char**)
     // Load Images
     int SceneWidth = 1038;
     int SceneHeight = 625;
-    bool SceneLoaded = LoadTextureFromFile("scene.png", &scene, &SceneWidth, &SceneHeight);
+    bool SceneLoaded = LoadTextureFromMemory(SceneData, sizeof(SceneData), &scene, &SceneWidth, &SceneHeight);
     IM_ASSERT(SceneLoaded);
 
     // Setup Fonts

@@ -7,25 +7,41 @@
 #include "Renderer.h"
 #include "WordManager.hpp"
 
-#define MAX_TRIES 5
 #define WHITE ImColor(255, 255, 255, 255)
 #define RED ImColor(255, 0, 0, 255)
 #define GREEN ImColor(0, 255, 0, 255)
 
 bool debug = true;
 bool game = true;
-
 Renderer* RENDERER = new Renderer;
 optional<string> RandWord = RandomWord();
-
 const char* message = "";
 char letter;
-size_t found;
 int NumWrongGuesses = 0;
-vector<char> guesses;
 
 // Initialize the secret word with the * character.
 string HiddenWord(RandWord.value().length(), '*');
+
+string HandleGuess(char letter)
+{
+	string word = RandWord.value();
+	
+	// Iterate over the characters in word and guess.
+	for (size_t i = 0; i < sizeof(word.c_str()); i++)
+	{
+		if (word.c_str()[i] == tolower(letter))
+		{
+			HiddenWord[i] = word[i]; // If the characters match at position i, update the underscore.
+			message = "You found a letter! Isn't that exciting!";
+		}
+		else
+		{
+			message = "Whoops! That letter isn't in there!";
+		}
+	}
+
+	return HiddenWord;
+}
 
 void DrawScene()
 {
@@ -34,7 +50,7 @@ void DrawScene()
 
 	// Handle Float to Char and Display FPS
 	char buffer[64];
-	int ret = snprintf(buffer, sizeof buffer, "%.f FPS", ImGui::GetIO().Framerate);
+	int ret = snprintf(buffer, sizeof(buffer), "%.f FPS", ImGui::GetIO().Framerate);
 	RENDERER->DrawTextW(ImVec2(1, 1), WHITE, buffer);
 
 	// DEBUG: Display Debug Info about the Game.
@@ -42,7 +58,7 @@ void DrawScene()
 		ImGui::Begin("Debug", &debug, ImGuiWindowFlags_NoResize);
 		ImGui::SetWindowSize(ImVec2(250, 100));
 		ImGui::Text("Current Word: %s", word);
-		ImGui::Text("Current Number of Guesses: %i", NumWrongGuesses);
+		ImGui::Text("Number of Wrong Guesses: %i", NumWrongGuesses);
 		ImGui::End();
 	}
 
@@ -55,33 +71,13 @@ void DrawScene()
 
 	// Key Press Loop
 	for (letter = 'A'; letter <= 'Z'; letter++) {
-		// If a key 'A' through 'Z' is pressed.
-		if (ImGui::IsKeyPressed(letter))
+		if (ImGui::IsKeyPressed(letter)) // If a key 'A' through 'Z' is pressed.
 		{
-			// Iterate over the characters in word and guess
-			for (size_t i = 0; i < sizeof(word.c_str()); i++)
-			{
-				if (word.c_str()[i] == tolower(letter))
-				{
-					HiddenWord[i] = word[i];  // If the characters match at position i, update the underscore.
-					message = "You found a letter! Isn't that exciting!";
-					wrong = false;
-					guesses.push_back(letter);
-					break;
-				}
-				else
-				{
-					wrong = true;
-					message = "Whoops! That letter isn't in there!";
-					guesses.push_back(letter);
-				}
-			}
+			HandleGuess(letter); // Handle the guess.
 		}
 	}
 
-	if (wrong) {
-		NumWrongGuesses++;
-	}
+	if (wrong) NumWrongGuesses++;
 
 	if (HiddenWord == word.c_str())
 	{
