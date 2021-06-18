@@ -169,7 +169,7 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="imgui\stb_image.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="SceneData.h" />
+    <ClInclude Include="SceneData.hpp" />
     <ClInclude Include="Style.h" />
     <ClInclude Include="WordManager.hpp" />
   </ItemGroup>

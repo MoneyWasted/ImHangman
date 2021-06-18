@@ -11,7 +11,7 @@
 #include "Style.h"
 #include "WordManager.hpp"
 
-#include "SceneData.h"
+#include "SceneData.hpp"
 
 // Data
 static ID3D11Device*             g_pd3dDevice = NULL;

@@ -62,6 +62,6 @@
     </ClInclude>
     <ClInclude Include="Style.h" />
     <ClInclude Include="WordManager.hpp" />
-    <ClInclude Include="SceneData.h" />
+    <ClInclude Include="SceneData.hpp" />
   </ItemGroup>
 </Project>
